@@ -1,1 +1,1 @@
-need to install node.js, express, mongoose and ejs
+need to install node.js, express, mongoose, ejs, method-override
