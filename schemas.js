@@ -1,4 +1,5 @@
 const Joi = require('joi');
+
 module.exports.campgroundSchema = Joi.object({
     campground: Joi.object({
         title: Joi.string().required(),
@@ -8,3 +9,10 @@ module.exports.campgroundSchema = Joi.object({
         description: Joi.string().required()
     }).required()
 }) //check the schema before mongoose gets involved
+
+module.exports.reviewSchema = Joi.object({
+    review: Joi.object({
+        rating: Joi.number().required(),
+        body: Joi.string().required()
+    }).required()
+})
