@@ -11,7 +11,8 @@ const reviews = require('./routes/reviews');
 mongoose.connect('mongodb://localhost:27017/yelp-camp', {
     useUnifiedTopology: true,
     useNewUrlParser: true,
-    useCreateIndex: true
+    useCreateIndex: true,
+    useFindAndModify: false
 });
 
 const db = mongoose.connection;
@@ -19,9 +20,6 @@ db.on('error', console.error.bind(console, 'connectio error:'));
 db.once('open', () => {
     console.log('Database connected');
 });
-
-mongoose.set('useFindAndModify', false);
-// Make Mongoose use `findOneAndUpdate()`. Note that this option is `true` by default
 
 const app = express();
 
@@ -34,6 +32,7 @@ app.set('views', path.join(__dirname, 'views'));
 // parse the request body
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
+app.use(express.static('public'))//the static diractory
 
 //using the express router for the prefix
 app.use('/campgrounds', campgrounds)
