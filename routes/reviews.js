@@ -26,6 +26,7 @@ router.post('/', validateReview, catchAsync(async(req, res) => {
     campground.reviews.push(review);
     await review.save();
     await campground.save();
+    req.flash('success', 'Created a new review!');
     res.redirect(`/campgrounds/${campground._id}`)
 }))
 
@@ -34,6 +35,7 @@ router.delete('/:reviewId', catchAsync( async(req, res) => {
     await Campground.findByIdAndUpdate(id, { $pull: { reviews: reviewId } })
     //$pull operator is a method from mongoose to pull all the specific related ones out
     await Review.findByIdAndDelete(reviewId)
+    req.flash('success', 'Successfully delete a review!');
     res.redirect(`/campgrounds/${id}`);
 }))
 
