@@ -1,6 +1,4 @@
-module.exports.isLoggedIn = (req, res, next) => {
-    //store the requested url
-    req.session.returnTo = req.originalUrl; 
+module.exports.isLoggedIn = (req, res, next) => {    
     //a helper fn from passport automatically add in request
     if (!req.isAuthenticated()) {
         req.flash('error', 'You must be signed in');
