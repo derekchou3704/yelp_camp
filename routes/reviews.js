@@ -2,27 +2,19 @@ const express = require('express');
 const router = express.Router({mergeParams: true});
 //otherwise the id from campground can't be read and would thus be null
 //Since it's not the id of reviews themselves
+const { validateReview, isLoggedIn, isReviewAuthor } = require('../middleware');
 
 const Campground = require('../models/campground');
 const Review = require('../models/review');
 
 const catchAsync = require('../utils/catchAsync');
-const { reviewSchema } = require('../schemas.js')
 
-//Middlewaew to validate Reviews
-const validateReview = (req, res, next) => {
-    const { error } = reviewSchema.validate(req.body);
-    if (error) {
-        const msg = error.details.map(el => el.message).join(',');
-        throw new ExpressError(msg, 400)
-    } else {
-        next();
-    }
-}
 
-router.post('/', validateReview, catchAsync(async(req, res) => {
+
+router.post('/',isLoggedIn, validateReview, catchAsync(async(req, res) => {
     const campground = await Campground.findById(req.params.id);
     const review = new Review(req.body.review);
+    review.author = req.user._id;
     campground.reviews.push(review);
     await review.save();
     await campground.save();
@@ -30,7 +22,7 @@ router.post('/', validateReview, catchAsync(async(req, res) => {
     res.redirect(`/campgrounds/${campground._id}`)
 }))
 
-router.delete('/:reviewId', catchAsync( async(req, res) => {
+router.delete('/:reviewId',isLoggedIn, isReviewAuthor, catchAsync( async(req, res) => {
     const { id, reviewId }= req.params;    
     await Campground.findByIdAndUpdate(id, { $pull: { reviews: reviewId } })
     //$pull operator is a method from mongoose to pull all the specific related ones out
