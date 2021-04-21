@@ -2,10 +2,15 @@ const express = require('express');
 const router = express.Router();
 const campgrounds = require('../controllers/campgrounds');
 const { validateCampground, isLoggedIn, isAuthor } = require('../middleware')
+const { storage } = require('../cloudinary') //automatically looking gor index.js file
+const multer  = require('multer')
+const upload = multer({ storage })
+
 
 router.route('/')
     .get(campgrounds.index)
-    .post(isLoggedIn, validateCampground, campgrounds.createCampground);
+    .post(isLoggedIn, upload.array('image'), validateCampground, campgrounds.createCampground);
+    
 
 router.get('/new', isLoggedIn, campgrounds.renderNewForm);
 
