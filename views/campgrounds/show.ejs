@@ -2,8 +2,7 @@
 <link rel="stylesheet" href="/stylesheets/stars.css">
 
 <div class="row">
-    <div class="col-6">
-        <div id='map' style='width: 400px; height: 300px;'></div>
+    <div class="col-6">        
         <div id="campgroundCarousel" class="carousel slide" data-bs-ride="carousel">
             <div class="carousel-inner">
             <% campground.images.forEach((img, i) => {  %>
@@ -21,33 +20,35 @@
                     <span class="visually-hidden">Next</span>
                 </button>
             <% } %> 
-            </div>            
-        <div class="card mb-3">            
-            <div class="card-body">
-                <h5 class="card-title"><%=campground.title%></h5>
-                <p class="card-text"><%=campground.description%></p>
+            </div>                    
+            <div class="card mb-3">            
+                <div class="card-body">
+                    <h5 class="card-title"><%=campground.title%></h5>
+                    <p class="card-text"><%=campground.description%></p>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item text-muted"><%=campground.location%></li>
+                    <li class="list-group-item text-muted">Submitted by <%=campground.author.username%></li>
+                    <li class="list-group-item">$ <%=campground.price%> /night</li>              
+                </ul>
+                <% if (currentUser && campground.author.equals(currentUser._id)) { %> 
+                <div class="card-body">
+                    <a class="card-link btn btn-primary" href="/campgrounds/<%=campground._id%>/edit">Edit</a>                
+                    <form class="d-inline" action="/campgrounds/<%=campground._id%>?_method=DELETE" method="POST">
+                        <button class="btn btn-danger">DELETE</button>
+                    </form>
+                </div>
+                <% } %> 
+                <div class="card-footer text-muted">
+                    2 Weeks Ago                
+                </div>            
+                <a class="btn btn-dark" href="/campgrounds">Back to All Campgrounds</a>            
             </div>
-            <ul class="list-group list-group-flush">
-                <li class="list-group-item text-muted"><%=campground.location%></li>
-                <li class="list-group-item text-muted">Submitted by <%=campground.author.username%></li>
-                <li class="list-group-item">$ <%=campground.price%> /night</li>              
-            </ul>
-            <% if (currentUser && campground.author.equals(currentUser._id)) { %> 
-            <div class="card-body">
-                <a class="card-link btn btn-primary" href="/campgrounds/<%=campground._id%>/edit">Edit</a>                
-                <form class="d-inline" action="/campgrounds/<%=campground._id%>?_method=DELETE" method="POST">
-                    <button class="btn btn-danger">DELETE</button>
-                </form>
-            </div>
-            <% } %> 
-            <div class="card-footer text-muted">
-                2 Weeks Ago                
-            </div>            
-            <a class="btn btn-dark" href="/campgrounds">Back to All Campgrounds</a>            
-          </div>           
+        </div>           
     </div>
 
     <div class="col-6">
+        <div id='map'></div>
         <% if(currentUser) { %> 
         <h3>Leave Your Review Below</h3>
           <form action="/campgrounds/<%=campground._id%>/reviews" method="POST" class="mb-3 validated-form" novalidate>
@@ -55,7 +56,7 @@
                   <label class="form-label" for="rating">Rating:</label>
                   <input class="form-range" type="range" min="1" max="5" name="review[rating]" id="rating">                  
               </div> -->
-              <div class="mb-5">
+            <div class="mb-5">
                 <fieldset class="starability-heart">                
                     <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]" value="1" checked aria-label="No rating." />
                     <input type="radio" id="first-rate1" name="review[rating]" value="1" />
