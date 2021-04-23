@@ -1,10 +1,10 @@
 <% layout('layouts/boilerplate') %>
-<div id="cluster-map"></div>
+<div id="cluster-map" class="mb-5"></div>
 
 <h1>All Campgrounds</h1>
-<div>
+<!-- <div>
     <a href="/campgrounds/new">Add Campground</a>
-</div>
+</div> -->
 
 <% for(let campground of campgrounds) {%>
     <div class="card mb-3">
@@ -19,7 +19,7 @@
             <div class="col-md-8">
                 <div class="card-body">
                     <h5 class="card-title"><%= campground.title %></h5>
-                    <h5 class="card-subtitle"><%= campground.properties.popUpMarkup %></h5>
+                    <!-- <h5 class="card-subtitle"><%= campground.properties.popUpMarkup %></h5> -->
                     <p class="card-text"><%= campground.description %></p>
                     <p><small class="text-muted"><%= campground.location %> </small></p>
                     <a href="/campgrounds/<%=campground._id%>" class="btn btn-primary">

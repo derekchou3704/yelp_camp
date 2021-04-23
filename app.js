@@ -1,8 +1,6 @@
 if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config();
 }
-// console.log(process.env.CLOUDINARY_CLOUD_NAME);
-// console.log(process.env.CLOUDINARY_KEY)
 
 const express = require('express');
 const path = require('path');
@@ -19,6 +17,10 @@ const User = require('./models/user');
 const userRoutes = require('./routes/users')
 const campgroundRoutes = require('./routes/campgrounds');
 const reviewRoutes = require('./routes/reviews');
+
+const mongoSanitize = require('express-mongo-sanitize');
+const helmet = require('helmet');
+
 
 mongoose.connect('mongodb://localhost:27017/yelp-camp', {
     useUnifiedTopology: true,
@@ -45,20 +47,80 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
 app.use(express.static('public'))//the static diractory
+app.use(mongoSanitize()) //to prevent mongo injection
 
 const sessionConfig = {
+    name: 'session', //to not use the default name i.e. .sid
     secret: 'thisshouldbeabettersecret',
     resave: false,
     saveUninitialized: true,
     cookie: {
         httpOnly: true, //for security
+        // secure: true, //allows https (s for secure) only
         expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
         maxAge:  1000 * 60 * 60 * 24 * 7,
     }
     //the above will be the memory store (local)
 }
+
+const scriptSrcUrls = [
+    "https://stackpath.bootstrapcdn.com/",
+    "https://api.tiles.mapbox.com/",
+    "https://api.mapbox.com/",
+    "https://fontawesome.com/",    
+    "https://cdnjs.cloudfare.com/",
+    "https://cdn.jsdelivr.net/",
+    "https://api.mapbox.com/mapbox-gl-js/",
+    "https://mongoosejs.com/"
+]
+const styleSrcUrls = [
+    "https://kit-free.fontawesome.com/",
+    "https://stackpath.bootstrapcdn.com/",
+    "https://cdn.jsdelivr.net",
+    "https://api.mapbox.com/",
+    "https://api.tiles.mapbox.com/",
+    "https://fonts.googleapis.com/",
+    "https://use.fontawesome.com/",
+    "mapbox://styles/mapbox/",
+    "https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/",
+    "https://api.mapbox.com/mapbox-gl-js/"
+]
+const connectSrcUrls = [
+    "https://api.mapbox.com/",
+    "https://a.tiles.mapbox.com/",
+    "https://b.tiles.com/",
+    "https://events.mapbox.com/",
+    "https://cdn.jsdelivr.net/",
+    "https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/",
+    "mapbox://styles/mapbox/",
+    "https://mongoosejs.com/"
+]
+const fontSrcUrls = []
+app.use(
+    helmet.contentSecurityPolicy({
+        directives: {
+            defaultSrc: [],
+            connectSrc: ["'self'", ...connectSrcUrls],
+            scriptSrc: ["'unsafe-inline'", "'self'", ...scriptSrcUrls],
+            styleSrc: ["'unsafe-inline'", "'self'", ...styleSrcUrls],
+            workerSrc: ["'self'", "blob:"],
+            objectSrc: [],
+            imgSrc: [
+                "'self'",
+                "blob:",
+                "data:",
+                "https://res.cloudinary.com/foxxx/",
+                "https://images.unsplash.com/"
+            ],
+            fontSrc: ["'self'", ...fontSrcUrls]
+        },
+    })
+);
+
+
 app.use(session(sessionConfig));
 app.use(flash());
+app.use(helmet({contentSecurityPolicy: false}));
 
 app.use(passport.initialize());
 //make sure it's below app.use(session())
@@ -78,6 +140,7 @@ app.use((req, res, next) => {
         //so it's not neccessary to deletle returnTo
         req.session.returnTo = req.originalUrl;        
     }
+    //console.log(req.query);
     res.locals.currentUser = req.user;
     res.locals.success = req.flash('success');
     res.locals.error = req.flash('error');
