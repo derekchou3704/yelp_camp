@@ -51,6 +51,8 @@ app.use(methodOverride('_method'));
 app.use(express.static('public'))//the static diractory
 app.use(mongoSanitize()) //to prevent mongo injection
 
+const secret = process.env.SECRET || 'thisshouldbeabettersecrete';
+
 const store = MongoStore.create({
     mongoUrl: dbUrl,
     secret: 'thisshouldbeabettersecrete',
