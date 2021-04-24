@@ -3,5 +3,5 @@ ejs-mate, joi, express-session, connect-flash, passport,
 passport-local, passport-local-mongoose, 
 multer, dotenv, cloudinary, multer-storage-cloudinary,
 @mapbox/mapbox-sdk, express-mongo-sanitize, sanitize-html
-helmet
+helmet, connect-mongo
 

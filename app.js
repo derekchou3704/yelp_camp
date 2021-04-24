@@ -13,6 +13,7 @@ const methodOverride = require('method-override');
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
 const User = require('./models/user');
+const MongoStore = require('connect-mongo');
 
 const userRoutes = require('./routes/users')
 const campgroundRoutes = require('./routes/campgrounds');
@@ -21,8 +22,9 @@ const reviewRoutes = require('./routes/reviews');
 const mongoSanitize = require('express-mongo-sanitize');
 const helmet = require('helmet');
 
-
-mongoose.connect('mongodb://localhost:27017/yelp-camp', {
+// use for deploying (Mongo Atlas)
+const dbUrl = 'mongodb://localhost:27017/yelp-camp'; //process.env.DB_URL
+mongoose.connect(dbUrl , {
     useUnifiedTopology: true,
     useNewUrlParser: true,
     useCreateIndex: true,
@@ -49,7 +51,18 @@ app.use(methodOverride('_method'));
 app.use(express.static('public'))//the static diractory
 app.use(mongoSanitize()) //to prevent mongo injection
 
-const sessionConfig = {
+const store = MongoStore.create({
+    mongoUrl: dbUrl,
+    secret: 'thisshouldbeabettersecrete',
+    touchAfter: 24 * 60 * 60 // in sec
+});
+
+// store.on(function(e) {
+//     console.log("SESSION Store Error!", e);
+// })
+
+const sessionConfig = {    
+    store,
     name: 'session', //to not use the default name i.e. .sid
     secret: 'thisshouldbeabettersecret',
     resave: false,
@@ -57,7 +70,7 @@ const sessionConfig = {
     cookie: {
         httpOnly: true, //for security
         // secure: true, //allows https (s for secure) only
-        expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
+        expires: Date.now() + 1000 * 60 * 60 * 24 * 7, //in ms
         maxAge:  1000 * 60 * 60 * 24 * 7,
     }
     //the above will be the memory store (local)
