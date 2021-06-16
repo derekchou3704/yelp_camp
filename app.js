@@ -55,13 +55,9 @@ const secret = process.env.SECRET || 'thisshouldbeabettersecrete';
 
 const store = MongoStore.create({
     mongoUrl: dbUrl,
-    secret: 'thisshouldbeabettersecrete',
+    secret,
     touchAfter: 24 * 60 * 60 // in sec
 });
-
-// store.on(function(e) {
-//     console.log("SESSION Store Error!", e);
-// })
 
 const sessionConfig = {    
     store,

@@ -54,20 +54,17 @@ module.exports.renderEditForm = catchAsync(async(req, res, next) => {
     
 })
 
-// WARNING!! CANNOT SUUCCESSFULLY DELETE!!
 module.exports.updateCampground =  catchAsync(async(req, res) => {
-    const { id } = req.params;      
+    const { id } = req.params; 
     const campground = await Campground.findByIdAndUpdate(id, { ...req.body.campground });
-    console.log(campground);
     const imgs = req.files.map(f => ({ url: f.path, filename: f.filename }));
     campground.images.push(...imgs);    
     await campground.save();  
     if (req.body.deleteImages) {
         for (let filename of req.body.deleteImages) {
-            console.log(filename)
             await cloudinary.uploader.destroy(filename);            
         }
-        await campground.updateOne({ $pull: { images: { filemame: { $in: req.body.deleteImages } } } });        
+        await campground.updateOne({ $pull: { images: { filename: { $in: req.body.deleteImages } } } });  
     }      
     req.flash('success', 'Successfully update the campground!');
     res.redirect(`/campgrounds/${campground._id}`);
